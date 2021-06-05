@@ -1,0 +1,31 @@
+{
+  "name": "a11ywatch-chrome-extension",
+  "version": "1.0.0",
+  "description": "a11ywatch chrome extension to get accessibility insights on your current tab",
+  "main": "dist",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc && bash build.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/A11yWatch/chrome-extension.git"
+  },
+  "keywords": [
+    "a11ywatch",
+    "a11ywatch-chrome-extension",
+    "chrome-extension",
+    "accessibility"
+  ],
+  "author": "Jeff Mendez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/A11yWatch/chrome-extension/issues"
+  },
+  "homepage": "https://github.com/A11yWatch/chrome-extension#readme",
+  "devDependencies": {
+    "@types/chrome": "0.0.144",
+    "@types/jest": "^26.0.23",
+    "typescript": "^4.3.2"
+  }
+}
