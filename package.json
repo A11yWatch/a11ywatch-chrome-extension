@@ -1,6 +1,6 @@
 {
   "name": "a11ywatch-chrome-extension",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "a11ywatch chrome extension to get accessibility insights on your current tab",
   "main": "dist",
   "scripts": {

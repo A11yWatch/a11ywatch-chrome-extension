@@ -7,7 +7,7 @@ type Issue = {
   code: string;
   message: string;
   context: string;
-}
+};
 
 chrome.runtime.onMessage.addListener(function (details) {
   const dataParsed = JSON.parse(details.data);
@@ -33,8 +33,8 @@ chrome.runtime.onMessage.addListener(function (details) {
     })
     .join("");
 
-    if(scanResults) {
-      scanResults.innerHTML = `
+  if (scanResults) {
+    scanResults.innerHTML = `
       <style>
         .speed {
           color: ${dataParsed.pageLoadTime.color};
@@ -89,7 +89,7 @@ chrome.runtime.onMessage.addListener(function (details) {
         ${issueList}
         </ol>
       </div>`;
-    }
+  }
 });
 
 // chrome.storage.sync.get('color', ({ color }) => {
@@ -111,7 +111,7 @@ scanPage.addEventListener("click", async function () {
 const getPageIssues = async () => {
   try {
     const response = await fetch(
-      `https://api.a11ywatch.com/api/scanWebsiteAsync?websiteUrl=${encodeURI(
+      `https://api.a11ywatch.com/api/scan-simple?websiteUrl=${encodeURI(
         location.href
       )}`,
       {

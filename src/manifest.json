@@ -1,25 +1,25 @@
 {
-    "name": "A11ywatch",
-    "description": "A11ywatch chrome extension to run accessibility reports for websites",
-    "version": "1.0",
-    "manifest_version": 3,
-    "background": {
-        "service_worker": "background.js"
-    },
-    "permissions": ["activeTab", "scripting"],
-    "action": {
-        "default_popup": "popup.html",
-        "default_icon": {
-            "16": "/static/img/icon.png",
-            "32": "/static/img/icon.png",
-            "48": "/static/img/icon.png",
-            "128": "/static/img/icon.png"
-        }
-    },
-    "icons": {
-        "16": "/static/img/icon.png",
-        "32": "/static/img/icon.png",
-        "48": "/static/img/icon.png",
-        "128": "/static/img/icon.png"
+  "name": "A11ywatch",
+  "description": "A11ywatch chrome extension to run accessibility reports for websites",
+  "version": "1.1",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "/static/img/icon.png",
+      "32": "/static/img/icon.png",
+      "48": "/static/img/icon.png",
+      "128": "/static/img/icon.png"
     }
+  },
+  "icons": {
+    "16": "/static/img/icon.png",
+    "32": "/static/img/icon.png",
+    "48": "/static/img/icon.png",
+    "128": "/static/img/icon.png"
   }
+}
