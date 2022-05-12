@@ -24,8 +24,8 @@
   },
   "homepage": "https://github.com/A11yWatch/chrome-extension#readme",
   "devDependencies": {
-    "@types/chrome": "0.0.144",
+    "@types/chrome": "0.0.184",
     "@types/jest": "^26.0.23",
-    "typescript": "^4.3.2"
+    "typescript": "4.3.2"
   }
 }

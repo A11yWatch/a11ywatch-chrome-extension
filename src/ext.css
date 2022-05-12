@@ -22,15 +22,18 @@ button:hover {
   padding: 5px;
 }
 
-#scanPage {
-  background-color: #1a1a1a;
-  color: #fff;
+.button-root {
   width: 100%;
   font-weight: 100;
   padding: 6px;
   padding-left: 12px;
   padding-right: 12px;
   border-radius: 5px;
+}
+
+#scanPage {
+  background-color: #1a1a1a;
+  color: #fff;
 }
 
 #a11yScanResults {
@@ -49,4 +52,17 @@ footer {
 
 ol {
   padding: 0;
+}
+
+/* input forms */
+#apiTokenForm {
+  padding-bottom: 12px;
+}
+
+#a11yToken {
+  margin-bottom: 4px;
+}
+
+label {
+  margin-bottom: 2px;
 }

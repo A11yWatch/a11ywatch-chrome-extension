@@ -7,11 +7,18 @@
       <main>
         <div class="small-gutter">
           <h1>Website Accessibility Scanner</h1>
-          <button id="scanPage" aria-label="Scan the current web page" class="current">Scan</button>
+          
+          <div id="apiTokenForm">
+            <label for="a11yToken">Enter API Key:</label>
+            <input id="a11yToken" name="a11yToken" type="text"></input>
+            <button id="a11yTokenSubmit" aria-label="Store API key" class="current button-root" type="button">Save</button>
+          </div>
+
+          <button id="scanPage" aria-label="Scan the current web page" class="current button-root" type="button">Scan</button>
         </div>
         <div id="a11yScanResults"></div>
       </main>
-      <footer id="a11yFooter"><span>&#169; 2021 A11yWatch, LLC</span></footer>
+      <footer id="a11yFooter"><span>&#169; 2022 A11yWatch, LLC</span></footer>
     <script type="text/javascript" src="popup.js"></script>
   </body>
 </html>

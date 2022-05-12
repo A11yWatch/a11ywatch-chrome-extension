@@ -1,7 +1,11 @@
-// let changeColor = document.getElementById('changeColor')
-let scanPage = document.getElementById("scanPage") as HTMLInputElement;
+let scanPage = document.getElementById("scanPage") as HTMLButtonElement;
 let scanResults = document.getElementById("a11yScanResults");
 let a11yIssues = document.getElementById("a11yIssues");
+// api key
+let tokenInput = document.getElementById("a11yToken") as HTMLInputElement;
+let tokenSubmit = document.getElementById(
+  "a11yTokenSubmit"
+) as HTMLButtonElement;
 
 type Issue = {
   code: string;
@@ -9,17 +13,23 @@ type Issue = {
   context: string;
 };
 
+// gather the details for the report
 chrome.runtime.onMessage.addListener(function (details) {
-  const dataParsed = JSON.parse(details.data);
+  const dataParsed = details && JSON.parse(details.data);
   scanPage.innerHTML = "Scan";
   scanPage.disabled = false;
 
-  if (scanResults && dataParsed.error) {
-    scanResults.innerHTML = `An Error Occured Please try again.`;
+  if (!dataParsed) {
     return;
   }
 
-  const issue = Array.isArray(dataParsed.issue) ? dataParsed.issue : [];
+  if (scanResults && dataParsed.error) {
+    scanResults.innerHTML =
+      dataParsed.error || `An Error Occured Please try again.`;
+    return;
+  }
+
+  const issue = Array.isArray(dataParsed?.issue) ? dataParsed.issue : [];
 
   const issueList = issue
     .map((issue: Issue) => {
@@ -34,10 +44,26 @@ chrome.runtime.onMessage.addListener(function (details) {
     .join("");
 
   if (scanResults) {
+    const pageLoadTime = dataParsed?.pageLoadTime ?? {
+      duration: 0,
+      durationFormated: "0ms",
+      color: "#276749",
+    };
+
+    const issuesinfo = dataParsed?.issuesInfo ?? {
+      totalIssues: 0,
+      warningCount: 0,
+      errorCount: 0,
+      possibleIssuesFixedByCdn: 0,
+      issueMeta: {
+        skipContentIncluded: false,
+      },
+    };
+
     scanResults.innerHTML = `
       <style>
         .speed {
-          color: ${dataParsed.pageLoadTime.color};
+          color: ${pageLoadTime?.color};
         }
         .a11y-info-box {
           background: #ccc;
@@ -66,19 +92,19 @@ chrome.runtime.onMessage.addListener(function (details) {
         <h3>Accessibility Score</h3>
         <p class="a11y-score">${dataParsed.adaScore}</p>
         <h4>Page Speed</h4>
-        <p>Duration is ${
-          dataParsed.pageLoadTime.durationFormated
-        } at <b class="speed">${dataParsed.pageLoadTime.duration}</b>ms</p>
+        <p>Duration is ${pageLoadTime?.durationFormated} at <b class="speed">${
+      pageLoadTime?.duration
+    }</b>ms</p>
         <h4>Info</h4>
         <div class="a11y-info-box">
-          <div>Total issues found: ${dataParsed.issuesInfo.totalIssues}</div>
-          <div>Total warnings: ${dataParsed.issuesInfo.warningCount}</div>
-          <div>Total errors: ${dataParsed.issuesInfo.errorCount}</div>
+          <div>Total issues found: ${issuesinfo?.totalIssues}</div>
+          <div>Total warnings: ${issuesinfo?.warningCount}</div>
+          <div>Total errors: ${issuesinfo?.errorCount}</div>
           <div>Possible issues fixed by CDN: ${
-            dataParsed.issuesInfo.possibleIssuesFixedByCdn
+            issuesinfo?.possibleIssuesFixedByCdn
           }</div>
           <div>Skip Content link found: ${
-            dataParsed.issuesInfo.issueMeta.skipContentIncluded ? "yes" : "no"
+            issuesinfo?.issueMeta?.skipContentIncluded ? "yes" : "no"
           }</div>
           <div>A11yWatch CDN connected: ${
             dataParsed.cdnConnected ? "yes" : "no"
@@ -92,41 +118,82 @@ chrome.runtime.onMessage.addListener(function (details) {
   }
 });
 
-// chrome.storage.sync.get('color', ({ color }) => {
-//   scanPage.style.backgroundColor = color
-// })
+const defaultError = (e?: string) => {
+  chrome.runtime.sendMessage({
+    sendBack: true,
+    data: {
+      error:
+        e ||
+        "API key error. Please add your api key or wait for your limits to reset. Check the A11yWatch API page for more details.",
+    },
+  });
+};
+
+function getPageIssues() {
+  chrome.storage.sync.get("jwt", ({ jwt }) => {
+    fetch("https://api.a11ywatch.com/api/scan-simple", {
+      method: "POST",
+      headers: {
+        Authorization: jwt,
+        websiteUrl: location.href,
+      },
+    })
+      .then((response) => {
+        if (response?.ok) {
+          response?.json().then((res: any) => {
+            const { data } = res;
+            if (data) {
+              chrome.runtime.sendMessage({
+                sendBack: true,
+                data: JSON.stringify(data),
+              });
+            } else {
+              defaultError();
+            }
+          });
+        } else {
+          defaultError();
+        }
+      })
+      .catch((e) => {
+        defaultError(e);
+      });
+  });
+}
+
+chrome.storage.sync.get("jwt", ({ jwt }) => {
+  if (jwt) {
+    tokenInput.value = jwt;
+  }
+});
+
+tokenSubmit.addEventListener("click", function () {
+  const jwt = tokenInput?.value;
+  if (jwt) {
+    chrome.storage.sync.set({ jwt: jwt.trim() });
+  } else {
+    alert("Please enter your API token from http://a11ywatch.com");
+  }
+});
 
 scanPage.addEventListener("click", async function () {
   this.innerHTML = "Loading...";
   this.disabled = true;
 
-  let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-  chrome.scripting.executeScript({
-    target: { tabId: tab.id ?? 0 },
-    function: getPageIssues,
-  });
+  chrome.tabs
+    .query({ active: true, currentWindow: true })
+    .then(([tab]) => {
+      chrome.scripting
+        .executeScript({
+          target: { tabId: tab?.id || 0 },
+          func: getPageIssues,
+        })
+        .then()
+        .catch((e) => {
+          console.error(e);
+        });
+    })
+    .catch((e) => {
+      console.error(e);
+    });
 });
-
-const getPageIssues = async () => {
-  try {
-    const response = await fetch(
-      `https://api.a11ywatch.com/api/scan-simple?websiteUrl=${encodeURI(
-        location.href
-      )}`,
-      {
-        method: "POST",
-      }
-    );
-    const data = await response.json();
-
-    if (data?.website) {
-      const web = data.website;
-      const dataSource = JSON.stringify(Object.assign({}, web, { html: null }));
-      chrome.runtime.sendMessage({ sendBack: true, data: dataSource });
-    }
-  } catch (e) {
-    console.error(e);
-    chrome.runtime.sendMessage({ sendBack: true, data: { error: e } });
-  }
-};
